@@ -8,7 +8,7 @@ func test_distance() -> void:
 	check_eq(Hex.distance(Vector2i(0, 0), Vector2i(0, 0)), 0)
 	check_eq(Hex.distance(Vector2i(0, 0), Vector2i(3, -1)), 3)
 	check_eq(Hex.distance(Vector2i(-2, 1), Vector2i(2, -1)), 4)
-	check_eq(Hex.distance(Vector2i(1, 2), Vector2i(-1, -2)), 4)
+	check_eq(Hex.distance(Vector2i(1, 2), Vector2i(-1, -2)), 6)
 
 
 func test_neighbors_are_six_unique_adjacent() -> void:
