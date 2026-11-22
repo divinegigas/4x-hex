@@ -21,7 +21,14 @@ jobs:
           godot --headless --version
 
       - name: Import project
-        run: godot --headless --import
+        run: |
+          godot --headless --import 2>&1 | tee import.log
+          ! grep -q "SCRIPT ERROR" import.log
 
       - name: Run tests
         run: godot --headless --script res://tests/run_tests.gd
+
+      - name: Smoke-run the main scene
+        run: |
+          godot --headless --quit-after 120 2>&1 | tee run.log
+          ! grep -qE "SCRIPT ERROR|ERROR:" run.log

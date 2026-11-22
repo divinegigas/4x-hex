@@ -11,7 +11,7 @@ func check(cond: bool, msg: String) -> void:
 
 
 func check_eq(actual: Variant, expected: Variant, msg: String = "") -> void:
-	var same := typeof(actual) == typeof(expected) and actual == expected
+	var same: bool = typeof(actual) == typeof(expected) and actual == expected
 	if not same and _is_number(actual) and _is_number(expected):
 		same = is_equal_approx(float(actual), float(expected))
 	if not same:
