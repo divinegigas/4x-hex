@@ -1,0 +1,47 @@
+{
+  "_notes": "Terrain types (design doc section 3). 'base' is the tile's stat block; 'season_overrides' replaces any base field for one season before the global season multipliers in seasons.json apply. 'colors' are the placeholder seasonal art (one flat colour per season) until real tile art exists. All yields and costs are placeholders to tune.",
+  "terrains": {
+    "grassland": {
+      "name": "Grassland",
+      "base": { "passable": true, "move_cost": 1.0, "food": 2.0, "wood": 0.0, "stone": 0.0, "gold": 0.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#5f7a3a", "summer": "#6b7d34", "fall": "#7a6a32", "winter": "#c9cfd2" }
+    },
+    "plains": {
+      "name": "Plains",
+      "base": { "passable": true, "move_cost": 1.0, "food": 1.0, "wood": 0.0, "stone": 0.0, "gold": 1.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#86864a", "summer": "#9a8d4c", "fall": "#8e6b3a", "winter": "#d5d8da" }
+    },
+    "forest": {
+      "name": "Forest",
+      "base": { "passable": true, "move_cost": 2.0, "food": 1.0, "wood": 2.0, "stone": 0.0, "gold": 0.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#2f4a2a", "summer": "#2b4426", "fall": "#5a3a1e", "winter": "#7d8b86" }
+    },
+    "hills": {
+      "name": "Hills",
+      "base": { "passable": true, "move_cost": 2.0, "food": 1.0, "wood": 0.0, "stone": 1.0, "gold": 0.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#6b6448", "summer": "#7a6d4a", "fall": "#6e5638", "winter": "#b9bcbc" }
+    },
+    "mountains": {
+      "name": "Mountains",
+      "base": { "passable": true, "move_cost": 3.0, "food": 0.0, "wood": 0.0, "stone": 2.0, "gold": 1.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#5a5560", "summer": "#615b66", "fall": "#57505a", "winter": "#e4e6ea" }
+    },
+    "swamp": {
+      "name": "Swamp",
+      "base": { "passable": true, "move_cost": 3.0, "food": 1.0, "wood": 1.0, "stone": 0.0, "gold": 0.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#3e4a32", "summer": "#45502f", "fall": "#4a3f2a", "winter": "#8a948a" }
+    },
+    "lake": {
+      "name": "Lake",
+      "base": { "passable": false, "move_cost": 1.0, "food": 1.0, "wood": 0.0, "stone": 0.0, "gold": 0.0 },
+      "season_overrides": {},
+      "colors": { "spring": "#2e4a5a", "summer": "#335466", "fall": "#2a4250", "winter": "#a9c3cf" }
+    }
+  }
+}

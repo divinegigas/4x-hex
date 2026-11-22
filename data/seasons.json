@@ -1,0 +1,10 @@
+{
+  "_notes": "Global seasonal multipliers (design doc section 2). Numbers marked placeholder in the doc are first guesses to tune. 'farm_output' scales every food yield; 'movement_cost' scales every tile's move cost; 'morale_drift' is a flat per-round change (used from build step 3); 'xp_gain' scales all XP (step 8); 'commander_pool_growth' is commanders added to the pool (step 8).",
+  "order": ["spring", "summer", "fall", "winter"],
+  "seasons": {
+    "spring": { "name": "Spring", "farm_output": 0.5, "movement_cost": 1.0, "morale_drift": 5, "xp_gain": 1.0, "commander_pool_growth": 1 },
+    "summer": { "name": "Summer", "farm_output": 1.0, "movement_cost": 0.5, "morale_drift": 0, "xp_gain": 1.0, "commander_pool_growth": 0 },
+    "fall":   { "name": "Fall",   "farm_output": 2.0, "movement_cost": 1.0, "morale_drift": 0, "xp_gain": 1.0, "commander_pool_growth": 0 },
+    "winter": { "name": "Winter", "farm_output": 0.1, "movement_cost": 2.0, "morale_drift": -5, "xp_gain": 2.0, "commander_pool_growth": 0 }
+  }
+}

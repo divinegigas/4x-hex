@@ -1,0 +1,9 @@
+# Godot
+.godot/
+*.import.tmp
+/android/
+/build/
+*.apk
+*.aab
+# Export presets can hold keystore paths and passwords
+export_presets.cfg
