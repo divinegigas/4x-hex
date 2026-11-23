@@ -11,7 +11,7 @@ the live doc is the source of truth). Read the relevant section before building 
 ```
 data/        Tunable numbers (JSON). Balance changes go here, never in code.
 src/sim/     Game rules. Pure RefCounted scripts: no Nodes, no UI, no input.
-src/view/    Drawing and camera (Node2D / Camera2D).
+src/view/    Drawing and camera (Node2D / Camera2D). 2.5D isometric; settings in data/view.json.
 src/ui/      HUD controls, built in code.
 src/main.gd  Wires sim -> view/ui. Only place that knows about all three.
 scenes/      main.tscn (just Main + script).
@@ -35,6 +35,10 @@ docs/        Design doc snapshot.
 - **Hex coords** are axial `Vector2i(q, r)`, pointy-top. Rectangular maps are stored as
   odd-r offset rows. All hex math is in `src/sim/hex.gd`; pixel conversion is in
   `src/view/hex_layout.gd`.
+- **Isometric view.** The grid is squashed vertically (`iso_y_scale`) and each tile is a
+  block raised by its terrain `elevation`. `src/view/iso_map_geometry.gd` owns the shapes,
+  back-to-front draw order and picking (front-most visible tile wins). Use its `centers`
+  to place anything drawn on a tile, not `HexLayout.to_pixel`, which ignores elevation.
 - **Typed GDScript.** Type variables and returns. Don't use `:=` on values from
   untyped variables (inference fails at parse time); write the type explicitly.
 - **Mobile first.** Landscape, `canvas_items` stretch from 1280x720, touch input

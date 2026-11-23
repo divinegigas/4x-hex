@@ -1,0 +1,9 @@
+{
+  "_notes": "Isometric view settings (display only, never game rules). iso_y_scale squashes the map vertically to fake a tilted camera (1.0 = top-down). hex_size is centre-to-corner in world pixels. A tile's top face is raised by terrain elevation x height_unit; every tile also gets a slab of base_thickness so flat ground still shows an edge. wall_shade_left/right darken the two visible side walls.",
+  "iso_y_scale": 0.6,
+  "hex_size": 48,
+  "height_unit": 10,
+  "base_thickness": 6,
+  "wall_shade_left": 0.25,
+  "wall_shade_right": 0.45
+}

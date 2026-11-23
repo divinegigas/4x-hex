@@ -35,6 +35,11 @@ func terrain_name(id: String) -> String:
 	return str(terrain(id).get("name", id))
 
 
+## Height of the terrain (used by the isometric view; later by terrain effects).
+func terrain_elevation(id: String) -> float:
+	return float(terrain(id).get("elevation", 0.0))
+
+
 func terrain_color(id: String, season_id: String) -> Color:
 	var colors: Dictionary = terrain(id).get("colors", {})
 	var hex_str := str(colors.get(season_id, ""))
@@ -75,6 +80,9 @@ func _validate() -> void:
 		errors.append("terrain.json: no terrains defined")
 	for id in terrains:
 		var t: Dictionary = terrains[id]
+		var elev: Variant = t.get("elevation", 0.0)
+		if typeof(elev) != TYPE_FLOAT and typeof(elev) != TYPE_INT:
+			errors.append("terrain.json: '%s' elevation is not a number" % id)
 		if not t.has("base"):
 			errors.append("terrain.json: '%s' has no 'base' block" % id)
 		var colors: Dictionary = t.get("colors", {})
