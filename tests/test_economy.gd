@@ -83,7 +83,7 @@ func test_starvation_empties_store_and_shrinks_population() -> void:
 	check_eq(r["starving"], true)
 	check_eq(r["food_after"], 0.0)
 	check_eq(r["population_after"], 50.0 * (1.0 - state.data.econ("starvation_shrink_rate")))
-	Economy.apply(r, city, state.get_faction(0))
+	Economy.apply(state.data, r, city, state.get_faction(0))
 	check(city.starving, "city flagged starving")
 	check_eq(city.food, 0.0)
 

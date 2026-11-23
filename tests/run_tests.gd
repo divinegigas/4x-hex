@@ -10,6 +10,7 @@ const TEST_FILES := [
 	"res://tests/test_map.gd",
 	"res://tests/test_iso.gd",
 	"res://tests/test_economy.gd",
+	"res://tests/test_condition.gd",
 ]
 
 

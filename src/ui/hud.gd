@@ -5,6 +5,8 @@ extends CanvasLayer
 signal end_round_pressed
 signal new_map_pressed
 signal ravage_pressed
+signal pace_selected(pace_id: String)
+signal rations_selected(rations_id: String)
 
 const BUTTON_SIZE := Vector2(170, 60)
 
@@ -13,6 +15,9 @@ var _season_label: Label
 var _treasury_label: Label
 var _tile_panel: PanelContainer
 var _tile_label: Label
+var _city_controls: VBoxContainer
+var _pace_buttons := {}
+var _rations_buttons := {}
 
 
 func _ready() -> void:
@@ -47,6 +52,14 @@ func _ready() -> void:
 	_tile_label = Label.new()
 	_tile_label.custom_minimum_size = Vector2(460, 0)
 	col.add_child(_tile_label)
+	_city_controls = VBoxContainer.new()
+	_city_controls.add_theme_constant_override("separation", 6)
+	col.add_child(_city_controls)
+	_pace_buttons = _add_choice_row(_city_controls, "Pace",
+		[["low", "Low"], ["normal", "Normal"], ["high", "High"]], pace_selected)
+	_rations_buttons = _add_choice_row(_city_controls, "Rations",
+		[["half", "Half"], ["normal", "Normal"], ["extra", "Extra"]], rations_selected)
+	_city_controls.visible = false
 	col.add_child(_make_button("Ravage (debug)", ravage_pressed))
 	_tile_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 12)
 	_tile_panel.visible = false
@@ -64,6 +77,23 @@ func show_tile(text: String) -> void:
 	_tile_label.text = text
 	_tile_panel.visible = true
 	# Re-anchor so the panel stays pinned bottom-left as its content changes height.
+	_tile_panel.reset_size()
+	_tile_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 12)
+
+
+## Show the pace/rations controls with the city's current settings pressed.
+func show_city_controls(pace_id: String, rations_id: String) -> void:
+	_city_controls.visible = true
+	for id in _pace_buttons:
+		_pace_buttons[id].set_pressed_no_signal(id == pace_id)
+	for id in _rations_buttons:
+		_rations_buttons[id].set_pressed_no_signal(id == rations_id)
+	_tile_panel.reset_size()
+	_tile_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 12)
+
+
+func hide_city_controls() -> void:
+	_city_controls.visible = false
 	_tile_panel.reset_size()
 	_tile_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 12)
 
@@ -88,6 +118,31 @@ func _make_button(text: String, sig: Signal) -> Button:
 	return b
 
 
+## A labelled row of mutually exclusive toggle buttons. Returns id -> Button.
+func _add_choice_row(parent: Container, title: String, choices: Array, sig: Signal) -> Dictionary:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	parent.add_child(row)
+	var label := Label.new()
+	label.text = title
+	label.custom_minimum_size = Vector2(110, 0)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(label)
+	var group := ButtonGroup.new()
+	var buttons := {}
+	for choice in choices:
+		var id: String = choice[0]
+		var b := Button.new()
+		b.text = choice[1]
+		b.toggle_mode = true
+		b.button_group = group
+		b.custom_minimum_size = Vector2(110, 60)
+		b.pressed.connect(func() -> void: sig.emit(id))
+		row.add_child(b)
+		buttons[id] = b
+	return buttons
+
+
 func _make_theme() -> Theme:
 	var theme := Theme.new()
 	theme.default_font_size = 26
@@ -96,4 +151,11 @@ func _make_theme() -> Theme:
 	panel.set_corner_radius_all(8)
 	panel.set_content_margin_all(12)
 	theme.set_stylebox("panel", "PanelContainer", panel)
+	var pressed := StyleBoxFlat.new()
+	pressed.bg_color = Color("#6b4f1d")
+	pressed.border_color = Color("#e8c15a")
+	pressed.set_border_width_all(2)
+	pressed.set_corner_radius_all(6)
+	pressed.set_content_margin_all(8)
+	theme.set_stylebox("pressed", "Button", pressed)
 	return theme

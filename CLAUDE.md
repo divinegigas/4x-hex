@@ -59,7 +59,7 @@ CI (`.github/workflows/tests.yml`) runs the same tests on every push.
 
 1. [x] Hex map, tile data and season flipping
 2. [x] One city: resources, food balance, storage cap
-3. [ ] Pace, rations, stamina and morale for cities
+3. [x] Pace, rations, stamina and morale for cities
 4. [ ] City expansion: adjacent districts, farms, mines, camps
 5. [ ] Units, engineers and movement
 6. [ ] Supply network: radius, camps, roads overlay, connectivity check, starvation
@@ -76,6 +76,11 @@ CI (`.github/workflows/tests.yml`) runs the same tests on every push.
 Step 2 notes: until farms/mines exist (step 4) every tile a city claims yields its raw
 terrain stats. Food and manpower live in the city; wood, stone and gold in the faction
 treasury. Economy math is in `src/sim/economy.gd` (`project` = report, `apply` = commit).
+
+Step 3 notes: stamina/morale/pace/rations numbers live in `data/condition.json`. Pace and
+morale scale all city output; stamina scales manpower only. Changes from a round take
+effect next round. Rebellion rolls use `GameState.rng` (seeded from the map) so games
+replay exactly; rebels are tracked in `City.rebels` for step 9 (savages).
 
 Commit after each step works. Hooks for later steps are marked in code
 (e.g. `GameState._resolve_end_of_round`).

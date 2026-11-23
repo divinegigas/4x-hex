@@ -9,6 +9,16 @@ var coord: Vector2i
 var population: float = 1.0
 var food: float = 0.0
 var manpower: float = 0.0
+## 0-100. Scales manpower (doc section 8).
+var stamina: float = 100.0
+## 0-200. morale / 100 multiplies everything the city produces.
+var morale: float = 100.0
+## "low", "normal" or "high" (condition.json).
+var pace: String = "normal"
+## "half", "normal" or "extra" (condition.json).
+var rations: String = "normal"
+## Population lost to rebellion so far; becomes savages in build step 9.
+var rebels: float = 0.0
 ## True when last round's food ran out (doc section 7: "when food hits zero").
 var starving: bool = false
 ## The Economy report from the last resolved round (empty before the first).

@@ -10,6 +10,7 @@ var season_order: PackedStringArray = []
 var setup: Dictionary = {}
 var economy: Dictionary = {}
 var races: Dictionary = {}
+var condition: Dictionary = {}
 ## Empty when all data loaded and validated.
 var errors: PackedStringArray = []
 
@@ -25,6 +26,7 @@ func _init(data_dir: String = "res://data") -> void:
 	economy = _load_json(data_dir.path_join("economy.json"))
 	var race_doc := _load_json(data_dir.path_join("races.json"))
 	races = race_doc.get("races", {})
+	condition = _load_json(data_dir.path_join("condition.json"))
 	_validate()
 
 
@@ -74,6 +76,24 @@ func storage_cap(resource: String) -> float:
 	return float(caps.get(resource, INF))
 
 
+## A value from a section of condition.json, e.g. condition_value("morale", "max").
+func condition_value(section: String, key: String, default_value: float = 0.0) -> float:
+	var sec: Dictionary = condition.get(section, {})
+	return float(sec.get(key, default_value))
+
+
+## A pace setting ("low", "normal", "high"); unknown ids fall back to normal.
+func pace(id: String) -> Dictionary:
+	var all: Dictionary = condition.get("pace", {})
+	return all.get(id, all.get("normal", {}))
+
+
+## A ration setting ("half", "normal", "extra"); unknown ids fall back to normal.
+func rations(id: String) -> Dictionary:
+	var all: Dictionary = condition.get("rations", {})
+	return all.get(id, all.get("normal", {}))
+
+
 func race(id: String) -> Dictionary:
 	return races.get(id, {})
 
@@ -115,6 +135,14 @@ func _validate() -> void:
 	for id in site_terrains:
 		if not terrains.has(str(id)):
 			errors.append("economy.json: city site terrain '%s' is not defined" % id)
+	for pair in [["pace", ["low", "normal", "high"]], ["rations", ["half", "normal", "extra"]]]:
+		var sec: Dictionary = condition.get(pair[0], {})
+		for id in pair[1]:
+			if not sec.has(id):
+				errors.append("condition.json: %s has no '%s' setting" % [pair[0], id])
+	for sec_name in ["stamina", "morale", "rebellion"]:
+		if not condition.has(sec_name):
+			errors.append("condition.json: missing '%s' section" % sec_name)
 	if races.is_empty():
 		errors.append("races.json: no races defined")
 	for id in races:

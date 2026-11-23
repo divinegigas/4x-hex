@@ -1,0 +1,16 @@
+{
+  "_notes": "Stamina, morale, pace and rations for cities (design doc section 8); armies reuse these from build step 5. pace.output and the morale multiplier (morale / 100, never below morale.output_floor) scale everything a city produces; stamina / 100 additionally scales manpower only. rations.food_use scales food eaten. stamina/morale values are per-round changes applied at the end of the round. Doc-suggested values: pace output 0.75/1/1.25 and stamina +10/0/-10; rebellion 1% per morale point below 50. Placeholders (not in the doc yet): rations stamina/morale amounts, starvation morale penalty, output_floor (0 morale -> 0 output is an open question), and rebellion.population_share (share of population that rebels and leaves when the roll hits; they become savages in build step 9).",
+  "pace": {
+    "low":    { "name": "Low pace",  "output": 0.75, "stamina": 10 },
+    "normal": { "name": "Normal",    "output": 1.0,  "stamina": 0 },
+    "high":   { "name": "High pace", "output": 1.25, "stamina": -10 }
+  },
+  "rations": {
+    "half":   { "name": "Half rations",  "food_use": 0.5, "stamina": -10, "morale": -10 },
+    "normal": { "name": "Normal",        "food_use": 1.0, "stamina": 0,   "morale": 0 },
+    "extra":  { "name": "Extra rations", "food_use": 2.0, "stamina": 10,  "morale": 5 }
+  },
+  "stamina": { "start": 100, "max": 100 },
+  "morale": { "start": 100, "min": 0, "max": 200, "starvation": -15, "output_floor": 0.25 },
+  "rebellion": { "threshold": 50, "chance_per_point": 0.01, "population_share": 0.1 }
+}

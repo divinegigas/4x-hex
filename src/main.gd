@@ -35,6 +35,8 @@ func _ready() -> void:
 	hud.end_round_pressed.connect(_on_end_round)
 	hud.new_map_pressed.connect(func() -> void: _start_game(0))
 	hud.ravage_pressed.connect(_on_ravage)
+	hud.pace_selected.connect(_on_pace_selected)
+	hud.rations_selected.connect(_on_rations_selected)
 
 	_start_game(int(data.setup.get("seed", 0)))
 
@@ -76,6 +78,29 @@ func _on_season_changed(_season_id: String) -> void:
 
 func _on_tile_selected(c: Vector2i) -> void:
 	hud.show_tile(_describe_tile(c))
+	var city := state.city_at(c)
+	if city != null and city.owner_id == 0:
+		hud.show_city_controls(city.pace, city.rations)
+	else:
+		hud.hide_city_controls()
+
+
+func _selected_city():
+	if not map_view.has_selection:
+		return null
+	return state.city_at(map_view.selected)
+
+
+func _on_pace_selected(pace_id: String) -> void:
+	var city = _selected_city()
+	if city != null and state.set_city_pace(city, pace_id):
+		_on_tile_selected(city.coord)
+
+
+func _on_rations_selected(rations_id: String) -> void:
+	var city = _selected_city()
+	if city != null and state.set_city_rations(city, rations_id):
+		_on_tile_selected(city.coord)
 
 
 func _on_ravage() -> void:
@@ -131,13 +156,29 @@ func _describe_city(city) -> PackedStringArray:
 	var lines: PackedStringArray = []
 	lines.append("— %s —" % city.city_name)
 	lines.append("Population %.1f  →  %.1f" % [r["population_before"], r["population_after"]])
+	lines.append("Stamina %d%%  →  %d%%     Morale %d  →  %d" % [
+		roundi(r["stamina_before"]), roundi(r["stamina_after"]), roundi(r["morale_before"]), roundi(r["morale_after"])])
+	var why: PackedStringArray = []
+	var changes: Dictionary = r["morale_changes"]
+	for k in changes:
+		why.append("%s %+d" % [k, roundi(changes[k])])
+	if not why.is_empty():
+		lines.append("   morale: " + ", ".join(why))
+	lines.append("Output ×%.2f  (pace ×%.2f · morale ×%.2f)   manpower also ×%.2f stamina" % [
+		r["output_multiplier"], r["pace_multiplier"], r["morale_multiplier"], r["stamina_multiplier"]])
 	var cap: float = r["food_cap"]
 	lines.append("Food %.1f / %s   +%.1f grown  −%.1f eaten  →  %.1f" % [
 		r["food_before"], ("%d" % cap) if cap < INF else "∞", prod["food"], r["food_eaten"], r["food_after"]])
 	if float(r["food_wasted"]) > 0.0:
 		lines.append("   %.1f food spoils (storage full)" % r["food_wasted"])
+	if float(r["ration_multiplier"]) != 1.0:
+		lines.append("   eating ×%.1f (%s)" % [r["ration_multiplier"], data.rations(city.rations).get("name", city.rations)])
 	if r["starving"]:
 		lines.append("   STARVING: short %.1f food, population shrinks" % r["food_shortfall"])
+	if float(r["rebellion_chance"]) > 0.0:
+		lines.append("   REBELLION RISK %d%% this round" % roundi(float(r["rebellion_chance"]) * 100.0))
+	if city.last_report.get("rebelled", false):
+		lines.append("   %.1f people rebelled last round" % float(city.last_report["rebels"]))
 	lines.append("Manpower %.1f  (+%.1f)" % [city.manpower, r["manpower_produced"]])
 	lines.append("Per round: Gold +%.1f · Wood +%.1f · Stone +%.1f" % [prod["gold"], prod["wood"], prod["stone"]])
 	lines.append("(%d tiles worked · %s)" % [r["tiles_worked"], data.season_name(state.season())])

@@ -17,12 +17,15 @@ var map: HexMap
 ## 1-based. Every round is one season.
 var round_number: int = 1
 var factions: Array[Faction] = []
+## Seeded from the map, so the same seed replays the same rebellions.
+var rng := RandomNumberGenerator.new()
 var cities: Array[City] = []
 
 
 func _init(game_data: GameData, hex_map: HexMap) -> void:
 	data = game_data
 	map = hex_map
+	rng.seed = hex_map.map_seed * 31 + 7
 
 
 func season_index() -> int:
@@ -53,6 +56,8 @@ func get_faction(id: int) -> Faction:
 ## Found a city at `at` and claim unowned tiles within city_claim_radius.
 func found_city(owner_id: int, at: Vector2i, display_name: String) -> City:
 	var city := City.new(cities.size(), display_name, owner_id, at)
+	city.stamina = data.condition_value("stamina", "start", 100.0)
+	city.morale = data.condition_value("morale", "start", 100.0)
 	cities.append(city)
 	var radius := int(data.econ("city_claim_radius", 1))
 	for c in Hex.within(at, radius):
@@ -78,6 +83,22 @@ func get_city(id: int) -> City:
 	return cities[id]
 
 
+## Change a city's pace ("low"/"normal"/"high"); returns false for an unknown id.
+func set_city_pace(city: City, pace_id: String) -> bool:
+	if not data.condition.get("pace", {}).has(pace_id):
+		return false
+	city.pace = pace_id
+	return true
+
+
+## Change a city's rations ("half"/"normal"/"extra"); returns false for an unknown id.
+func set_city_rations(city: City, rations_id: String) -> bool:
+	if not data.condition.get("rations", {}).has(rations_id):
+		return false
+	city.rations = rations_id
+	return true
+
+
 ## What a city's economy will do at the end of this round (nothing is changed).
 func project_city(city: City) -> Dictionary:
 	return Economy.project(data, map, city, season())
@@ -93,9 +114,12 @@ func end_round() -> void:
 
 func _resolve_end_of_round() -> void:
 	# Food production and consumption use the season of the round just played.
+	# Stamina, morale and rebellion rolls resolve here too (doc section 8).
 	for city in cities:
-		Economy.apply(project_city(city), city, get_faction(city.owner_id))
-	# Build steps 3-6: stamina and morale, supply connectivity, army starvation.
+		var report := project_city(city)
+		var rebelled := rng.randf() < float(report["rebellion_chance"])
+		Economy.apply(data, report, city, get_faction(city.owner_id), rebelled)
+	# Build steps 5-6: army condition, supply connectivity, army starvation.
 
 
 func _begin_round() -> void:
