@@ -1,11 +1,15 @@
 {
-  "_notes": "Game setup defaults (design doc section 3). seed 0 means pick a random seed. Generation fractions are shares of all tiles, assigned by noise rank so every map has a predictable terrain mix.",
+  "_notes": "Game setup defaults (design doc section 3). seed 0 means pick a random seed. Generation fractions are shares of all tiles, assigned by noise rank so every map has a predictable terrain mix. player_race is the race of the human player's faction (see races.json).",
   "seed": 0,
+  "player_race": "humans",
   "map_width": 40,
   "map_height": 28,
   "savage_spawn_tiles": 8,
   "savage_spawn_min_distance": 5,
-  "savage_spawn_terrains": ["swamp", "hills"],
+  "savage_spawn_terrains": [
+    "swamp",
+    "hills"
+  ],
   "ravaged_yield_multiplier": 0.5,
   "generation": {
     "noise_frequency": 0.08,

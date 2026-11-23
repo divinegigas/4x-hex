@@ -58,7 +58,7 @@ CI (`.github/workflows/tests.yml`) runs the same tests on every push.
 ## Build order (design doc section 15)
 
 1. [x] Hex map, tile data and season flipping
-2. [ ] One city: resources, food balance, storage cap
+2. [x] One city: resources, food balance, storage cap
 3. [ ] Pace, rations, stamina and morale for cities
 4. [ ] City expansion: adjacent districts, farms, mines, camps
 5. [ ] Units, engineers and movement
@@ -72,6 +72,10 @@ CI (`.github/workflows/tests.yml`) runs the same tests on every push.
 13. [ ] Tech tree depth and victory conditions
 14. [ ] Art, audio and polish
 15. [ ] Additional races, then Grey Aliens
+
+Step 2 notes: until farms/mines exist (step 4) every tile a city claims yields its raw
+terrain stats. Food and manpower live in the city; wood, stone and gold in the faction
+treasury. Economy math is in `src/sim/economy.gd` (`project` = report, `apply` = commit).
 
 Commit after each step works. Hooks for later steps are marked in code
 (e.g. `GameState._resolve_end_of_round`).

@@ -9,6 +9,8 @@ var coord: Vector2i
 var terrain: String
 ## Faction id; -1 means unclaimed.
 var owner_id: int = -1
+## Id of the city this tile belongs to and yields for; -1 when none.
+var city_id: int = -1
 ## "", "city", "district", "farm", "mine", "camp" or "road" (from build step 2 on).
 var improvement: String = ""
 ## Savage lair: savages spawn here (build step 9).

@@ -1,0 +1,13 @@
+{
+  "_notes": "City economy (design doc section 7). Resolved once per city at the end of every round, using that round's season. Food and manpower are stored in the city; wood, stone and gold go to the owning faction's treasury. Until farms and mines exist (build step 4), every tile a city claims yields its raw terrain stats. Values marked suggested in the doc: starvation_shrink_rate (10%). Everything else is a placeholder to tune. growth_rate is NOT in the doc yet: population grows by this share in any round where food produced exceeds food eaten (set to 0 to disable).",
+  "food_per_pop": 1.0,
+  "manpower_per_pop": 0.5,
+  "storage_caps": { "food": 60 },
+  "starvation_shrink_rate": 0.10,
+  "growth_rate": 0.03,
+  "min_population": 1.0,
+  "city_claim_radius": 1,
+  "city_centre_bonus": { "food": 2.0, "wood": 0.0, "stone": 1.0, "gold": 2.0 },
+  "city_site_terrains": ["grassland", "plains"],
+  "city_min_lair_distance": 4
+}

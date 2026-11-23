@@ -1,0 +1,13 @@
+{
+  "_notes": "Races as data (design doc section 5, race template). Version 1 ships Humans only. starting_resources: food and manpower go into the first city; wood, stone and gold into the faction treasury. color is the faction's border and banner colour on the map. Stat modifiers, unit rosters and resource rules join this file in later build steps.",
+  "races": {
+    "humans": {
+      "name": "Humans",
+      "playable": true,
+      "color": "#c9a04a",
+      "starting_population": 5.0,
+      "starting_resources": { "food": 20.0, "manpower": 0.0, "wood": 20.0, "stone": 10.0, "gold": 50.0 },
+      "city_names": ["Ashford", "Greyhollow", "Wolfsmere", "Blackmoor", "Thornwall", "Ravenholt"]
+    }
+  }
+}

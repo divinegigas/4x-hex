@@ -8,6 +8,8 @@ var terrains: Dictionary = {}
 var seasons: Dictionary = {}
 var season_order: PackedStringArray = []
 var setup: Dictionary = {}
+var economy: Dictionary = {}
+var races: Dictionary = {}
 ## Empty when all data loaded and validated.
 var errors: PackedStringArray = []
 
@@ -20,6 +22,9 @@ func _init(data_dir: String = "res://data") -> void:
 	season_order = PackedStringArray(order)
 	seasons = season_doc.get("seasons", {})
 	setup = _load_json(data_dir.path_join("setup.json"))
+	economy = _load_json(data_dir.path_join("economy.json"))
+	var race_doc := _load_json(data_dir.path_join("races.json"))
+	races = race_doc.get("races", {})
 	_validate()
 
 
@@ -59,6 +64,20 @@ func season_name(season_id: String) -> String:
 	return str(s.get("name", season_id.capitalize()))
 
 
+func econ(key: String, default_value: float = 0.0) -> float:
+	return float(economy.get(key, default_value))
+
+
+## Storage cap for a resource, or INF when it has none.
+func storage_cap(resource: String) -> float:
+	var caps: Dictionary = economy.get("storage_caps", {})
+	return float(caps.get(resource, INF))
+
+
+func race(id: String) -> Dictionary:
+	return races.get(id, {})
+
+
 func _load_json(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
 		errors.append("Missing data file: %s" % path)
@@ -89,6 +108,24 @@ func _validate() -> void:
 		for s in season_order:
 			if not Color.html_is_valid(str(colors.get(s, ""))):
 				errors.append("terrain.json: '%s' has no valid %s colour" % [id, s])
+	for key in ["food_per_pop", "manpower_per_pop", "starvation_shrink_rate", "growth_rate", "min_population", "city_claim_radius"]:
+		if not economy.has(key):
+			errors.append("economy.json: missing '%s'" % key)
+	var site_terrains: Array = economy.get("city_site_terrains", [])
+	for id in site_terrains:
+		if not terrains.has(str(id)):
+			errors.append("economy.json: city site terrain '%s' is not defined" % id)
+	if races.is_empty():
+		errors.append("races.json: no races defined")
+	for id in races:
+		var r: Dictionary = races[id]
+		for key in ["name", "color", "starting_population", "starting_resources", "city_names"]:
+			if not r.has(key):
+				errors.append("races.json: '%s' is missing '%s'" % [id, key])
+		if not Color.html_is_valid(str(r.get("color", ""))):
+			errors.append("races.json: '%s' color is not a valid colour" % id)
+	if not races.has(str(setup.get("player_race", ""))):
+		errors.append("setup.json: player_race '%s' is not in races.json" % setup.get("player_race", ""))
 	var spawn_terrains: Array = setup.get("savage_spawn_terrains", [])
 	for id in spawn_terrains:
 		if not terrains.has(str(id)):
