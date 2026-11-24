@@ -35,18 +35,86 @@ func test_generation_is_deterministic() -> void:
 	check(_terrain_signature(a) != _terrain_signature(c), "different seeds should differ")
 
 
-func test_terrain_mix_matches_setup() -> void:
+func test_salt_water_share_matches_setup() -> void:
 	var map := MapGenerator.generate(data, 7)
-	var counts := {}
+	var salt := 0
 	for c in map.tiles:
-		var t: String = map.get_tile(c).terrain
-		counts[t] = int(counts.get(t, 0)) + 1
-	var n := map.tile_count()
-	var gen: Dictionary = data.setup["generation"]
-	check_eq(int(counts.get("lake", 0)), int(n * float(gen["lake_fraction"])))
-	check_eq(int(counts.get("mountains", 0)), int(n * float(gen["mountain_fraction"])))
-	check(int(counts.get("grassland", 0)) > 0, "has grassland")
-	check(int(counts.get("plains", 0)) > 0, "has plains")
+		if data.terrain_water(map.get_tile(c).terrain) == "salt":
+			salt += 1
+	var share := float(data.setup["generation"]["ocean_fraction"])
+	# Lakes that touch the sea become coast too, so there can be a few extra.
+	check(salt >= int(map.tile_count() * share), "salt tiles %d" % salt)
+	var land := 0
+	for c in map.tiles:
+		if data.terrain_water(map.get_tile(c).terrain) == "":
+			land += 1
+	check(land > map.tile_count() / 2, "mostly land (%d)" % land)
+
+
+func test_land_never_touches_ocean() -> void:
+	for map_seed in [3, 7, 42, 99, 2024]:
+		var map := MapGenerator.generate(data, map_seed)
+		for c in map.tiles:
+			if map.get_tile(c).terrain != "ocean":
+				continue
+			for nb in map.neighbors_of(c):
+				var t: String = map.get_tile(nb).terrain
+				check(t == "ocean" or t == "coast", "seed %d: %s next to ocean at %s" % [map_seed, t, nb])
+
+
+func test_lakes_are_inland() -> void:
+	for map_seed in [3, 7, 42, 99, 2024]:
+		var map := MapGenerator.generate(data, map_seed)
+		for c in map.tiles:
+			if map.get_tile(c).terrain != "lake":
+				continue
+			for nb in map.neighbors_of(c):
+				check(data.terrain_water(map.get_tile(nb).terrain) != "salt", "seed %d: lake %s touches the sea" % [map_seed, c])
+
+
+func test_oceans_ring_the_map_edges() -> void:
+	var map := MapGenerator.generate(data, 42)
+	var edge := 0
+	var salt := 0
+	for row in map.height:
+		for col in map.width:
+			if row != 0 and col != 0 and row != map.height - 1 and col != map.width - 1:
+				continue
+			edge += 1
+			if data.terrain_water(map.get_tile(Hex.offset_to_axial(col, row)).terrain) == "salt":
+				salt += 1
+	check(salt >= edge * 0.8, "%d of %d edge tiles are sea" % [salt, edge])
+
+
+## Every lake and river tile reaches the sea through lakes and rivers.
+func test_fresh_water_drains_to_the_sea() -> void:
+	for map_seed in [3, 7, 42, 99, 2024]:
+		var map := MapGenerator.generate(data, map_seed)
+		var rivers := 0
+		for c in map.tiles:
+			var t: String = map.get_tile(c).terrain
+			if t == "river":
+				rivers += 1
+			if t != "lake" and t != "river":
+				continue
+			check(_reaches_sea(map, c), "seed %d: %s at %s does not reach the sea" % [map_seed, t, c])
+		check(rivers > 0, "seed %d has rivers" % map_seed)
+
+
+func _reaches_sea(map, start: Vector2i) -> bool:
+	var queue: Array[Vector2i] = [start]
+	var seen := {start: true}
+	var i := 0
+	while i < queue.size():
+		for nb in map.neighbors_of(queue[i]):
+			var t: String = map.get_tile(nb).terrain
+			if data.terrain_water(t) == "salt":
+				return true
+			if (t == "lake" or t == "river") and not seen.has(nb):
+				seen[nb] = true
+				queue.append(nb)
+		i += 1
+	return false
 
 
 func test_lairs_count_terrain_and_spacing() -> void:

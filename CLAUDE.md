@@ -73,6 +73,10 @@ CI (`.github/workflows/tests.yml`) runs the same tests on every push.
 14. [ ] Art, audio and polish
 15. [ ] Additional races, then Grey Aliens
 
+Map notes: `src/sim/map_generator.gd` runs ocean -> coast buffer -> land terrain -> rivers ->
+lairs. Invariants (tested): land never touches ocean (coast in between), lakes are inland,
+every lake and river drains to the sea. Terrain `water` tag: "salt", "fresh" or none.
+
 Step 2 notes: until farms/mines exist (step 4) every tile a city claims yields its raw
 terrain stats. Food and manpower live in the city; wood, stone and gold in the faction
 treasury. Economy math is in `src/sim/economy.gd` (`project` = report, `apply` = commit).

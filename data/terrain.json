@@ -1,5 +1,5 @@
 {
-  "_notes": "Terrain types (design doc section 3). 'base' is the tile's stat block; 'season_overrides' replaces any base field for one season before the global season multipliers in seasons.json apply. 'colors' are the placeholder seasonal art (one flat colour per season) until real tile art exists. All yields and costs are placeholders to tune. 'elevation' is the tile's height in the isometric view (and later terrain effects); multiplied by height_unit in view.json.",
+  "_notes": "Terrain types (design doc section 3). 'base' is the tile's stat block; 'season_overrides' replaces any base field for one season before the global season multipliers in seasons.json apply. 'colors' are the placeholder seasonal art (one flat colour per season) until real tile art exists. All yields and costs are placeholders to tune. 'elevation' is the tile's height in the isometric view (and later terrain effects); multiplied by height_unit in view.json. 'water' marks water tiles: 'salt' (ocean, coast) or 'fresh' (lake, river); land has none. Ocean, coast and lakes are impassable to land units; rivers can be forded at a higher move cost.",
   "terrains": {
     "grassland": {
       "name": "Grassland",
@@ -117,7 +117,7 @@
     },
     "lake": {
       "name": "Lake",
-      "elevation": 0.0,
+      "elevation": 0.3,
       "base": {
         "passable": false,
         "move_cost": 1.0,
@@ -132,6 +132,67 @@
         "summer": "#335466",
         "fall": "#2a4250",
         "winter": "#a9c3cf"
+      },
+      "water": "fresh"
+    },
+    "ocean": {
+      "name": "Ocean",
+      "elevation": 0.0,
+      "water": "salt",
+      "base": {
+        "passable": false,
+        "move_cost": 1.0,
+        "food": 1.0,
+        "wood": 0.0,
+        "stone": 0.0,
+        "gold": 0.0
+      },
+      "season_overrides": {},
+      "colors": {
+        "spring": "#1c3347",
+        "summer": "#1f3a52",
+        "fall": "#1b3040",
+        "winter": "#2a3e4c"
+      }
+    },
+    "coast": {
+      "name": "Coast",
+      "elevation": 0.15,
+      "water": "salt",
+      "base": {
+        "passable": false,
+        "move_cost": 1.0,
+        "food": 2.0,
+        "wood": 0.0,
+        "stone": 0.0,
+        "gold": 1.0
+      },
+      "season_overrides": {},
+      "colors": {
+        "spring": "#3a6a7a",
+        "summer": "#417587",
+        "fall": "#355f6d",
+        "winter": "#9fbcc8"
+      }
+    },
+    "river": {
+      "name": "River",
+      "elevation": 0.6,
+      "water": "fresh",
+      "base": {
+        "passable": true,
+        "move_cost": 2.0,
+        "food": 3.0,
+        "wood": 0.0,
+        "stone": 0.0,
+        "gold": 1.0
+      },
+      "season_overrides": {},
+      "colors": {
+        "spring": "#3f7486",
+        "summer": "#4a8193",
+        "fall": "#3b6676",
+        "winter": "#b8ccd4"
       }
     }
   }

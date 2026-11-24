@@ -47,6 +47,11 @@ func terrain_elevation(id: String) -> float:
 	return float(terrain(id).get("elevation", 0.0))
 
 
+## "salt", "fresh" or "" (land).
+func terrain_water(id: String) -> String:
+	return str(terrain(id).get("water", ""))
+
+
 func terrain_color(id: String, season_id: String) -> Color:
 	var colors: Dictionary = terrain(id).get("colors", {})
 	var hex_str := str(colors.get(season_id, ""))
@@ -143,6 +148,9 @@ func _validate() -> void:
 	for sec_name in ["stamina", "morale", "rebellion"]:
 		if not condition.has(sec_name):
 			errors.append("condition.json: missing '%s' section" % sec_name)
+	for id in ["ocean", "coast", "lake", "river", "grassland", "plains", "forest", "hills", "mountains", "swamp"]:
+		if not terrains.has(id):
+			errors.append("terrain.json: map generator needs terrain '%s'" % id)
 	if races.is_empty():
 		errors.append("races.json: no races defined")
 	for id in races:

@@ -125,10 +125,13 @@ func _describe_tile(c: Vector2i) -> String:
 	var s := tile.stats(data, state.season())
 	var lines: PackedStringArray = []
 	lines.append("%s   (%d, %d)" % [data.terrain_name(tile.terrain), c.x, c.y])
+	var water := data.terrain_water(tile.terrain)
+	if water != "":
+		lines.append("Fresh water" if water == "fresh" else "Salt water")
 	if s["passable"]:
 		lines.append("Move cost: %.1f" % s["move_cost"])
 	else:
-		lines.append("Impassable")
+		lines.append("Impassable on foot")
 	lines.append("Food %.1f · Wood %.1f · Stone %.1f · Gold %.1f" % [s["food"], s["wood"], s["stone"], s["gold"]])
 	if tile.owner_id < 0:
 		lines.append("Unclaimed")
