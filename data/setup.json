@@ -1,7 +1,8 @@
 {
-  "_notes": "Game setup defaults (design doc section 3). seed 0 means pick a random seed. player_race is the race of the human player's faction (see races.json). Generation: ocean_fraction is the share of ALL tiles that becomes salt water (ocean, plus coast wherever ocean meets land, so land never touches ocean directly); edge_ocean_width/strength push oceans toward the map edges. The other *_fraction values are shares of the LAND tiles, assigned by noise rank. Lakes are inland only; each lake gets a river to the sea, and river_sources extra rivers start in hills or mountains and run to the nearest water.",
+  "_notes": "Game setup defaults (design doc section 3). seed 0 means pick a random seed. player_race is the race of the human player's faction (see races.json). map_type picks a preset from map_types.json, which holds all terrain generation settings.",
   "seed": 0,
   "player_race": "humans",
+  "map_type": "continents",
   "map_width": 40,
   "map_height": 28,
   "savage_spawn_tiles": 8,
@@ -10,18 +11,5 @@
     "swamp",
     "hills"
   ],
-  "ravaged_yield_multiplier": 0.5,
-  "generation": {
-    "noise_frequency": 0.08,
-    "ocean_fraction": 0.22,
-    "edge_ocean_width": 5,
-    "edge_ocean_strength": 0.7,
-    "lake_fraction": 0.04,
-    "mountain_fraction": 0.08,
-    "hills_fraction": 0.14,
-    "swamp_fraction": 0.08,
-    "forest_fraction": 0.26,
-    "plains_fraction_of_rest": 0.4,
-    "river_sources": 4
-  }
+  "ravaged_yield_multiplier": 0.5
 }

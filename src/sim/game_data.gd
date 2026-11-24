@@ -11,6 +11,7 @@ var setup: Dictionary = {}
 var economy: Dictionary = {}
 var races: Dictionary = {}
 var condition: Dictionary = {}
+var map_types: Dictionary = {}
 ## Empty when all data loaded and validated.
 var errors: PackedStringArray = []
 
@@ -27,6 +28,7 @@ func _init(data_dir: String = "res://data") -> void:
 	var race_doc := _load_json(data_dir.path_join("races.json"))
 	races = race_doc.get("races", {})
 	condition = _load_json(data_dir.path_join("condition.json"))
+	map_types = _load_json(data_dir.path_join("map_types.json"))
 	_validate()
 
 
@@ -99,6 +101,32 @@ func rations(id: String) -> Dictionary:
 	return all.get(id, all.get("normal", {}))
 
 
+## Map type ids in file order.
+func map_type_ids() -> PackedStringArray:
+	var types: Dictionary = map_types.get("types", {})
+	return PackedStringArray(types.keys())
+
+
+func map_type_name(id: String) -> String:
+	var types: Dictionary = map_types.get("types", {})
+	var t: Dictionary = types.get(id, {})
+	return str(t.get("name", id.capitalize()))
+
+
+## Full generation settings for a map type: defaults overlaid with the type's changes.
+## Unknown ids fall back to the default type.
+func generation_params(type_id: String) -> Dictionary:
+	var types: Dictionary = map_types.get("types", {})
+	if not types.has(type_id):
+		type_id = str(map_types.get("default", ""))
+	var params: Dictionary = map_types.get("defaults", {}).duplicate(true)
+	var t: Dictionary = types.get(type_id, {})
+	var changes: Dictionary = t.get("generation", {})
+	for k in changes:
+		params[k] = changes[k]
+	return params
+
+
 func race(id: String) -> Dictionary:
 	return races.get(id, {})
 
@@ -151,6 +179,19 @@ func _validate() -> void:
 	for id in ["ocean", "coast", "lake", "river", "grassland", "plains", "forest", "hills", "mountains", "swamp"]:
 		if not terrains.has(id):
 			errors.append("terrain.json: map generator needs terrain '%s'" % id)
+	var types: Dictionary = map_types.get("types", {})
+	if types.is_empty():
+		errors.append("map_types.json: no map types defined")
+	if not types.has(str(map_types.get("default", ""))):
+		errors.append("map_types.json: default type '%s' is not defined" % map_types.get("default", ""))
+	var defaults: Dictionary = map_types.get("defaults", {})
+	for id in types:
+		var changes: Dictionary = types[id].get("generation", {})
+		for k in changes:
+			if not defaults.has(k):
+				errors.append("map_types.json: '%s' sets unknown setting '%s'" % [id, k])
+	if not types.has(str(setup.get("map_type", ""))):
+		errors.append("setup.json: map_type '%s' is not in map_types.json" % setup.get("map_type", ""))
 	if races.is_empty():
 		errors.append("races.json: no races defined")
 	for id in races:

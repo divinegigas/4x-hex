@@ -1,0 +1,66 @@
+{
+  "_notes": "Map types (like AoE map scripts). 'defaults' holds every generation setting; each type lists only the settings it changes. Settings: noise_frequency (higher = smaller, more broken-up features); ocean_fraction (share of ALL tiles that is sea; ocean touching land becomes coast); edge_ocean_width/strength (how strongly seas hug the map edges; 0 strength = seas anywhere); lake_/mountain_/hills_/swamp_/forest_fraction (shares of the LAND tiles); plains_fraction_of_rest (driest share of the remaining open land); river_sources (extra rivers from hills/mountains; every lake also gets one). Types needing more than parameters (e.g. scripted layouts) can add a 'script' key later and branch in map_generator.gd.",
+  "default": "continents",
+  "defaults": {
+    "noise_frequency": 0.08,
+    "ocean_fraction": 0.22,
+    "edge_ocean_width": 5,
+    "edge_ocean_strength": 0.7,
+    "lake_fraction": 0.04,
+    "mountain_fraction": 0.08,
+    "hills_fraction": 0.14,
+    "swamp_fraction": 0.08,
+    "forest_fraction": 0.26,
+    "plains_fraction_of_rest": 0.4,
+    "river_sources": 4
+  },
+  "types": {
+    "continents": {
+      "name": "Continents",
+      "generation": {}
+    },
+    "islands": {
+      "name": "Islands",
+      "generation": {
+        "noise_frequency": 0.13,
+        "ocean_fraction": 0.5,
+        "edge_ocean_width": 3,
+        "edge_ocean_strength": 0.5,
+        "lake_fraction": 0.01,
+        "river_sources": 2
+      }
+    },
+    "great_lakes": {
+      "name": "Great Lakes",
+      "generation": {
+        "noise_frequency": 0.06,
+        "ocean_fraction": 0.12,
+        "edge_ocean_width": 3,
+        "lake_fraction": 0.14,
+        "swamp_fraction": 0.1,
+        "river_sources": 3
+      }
+    },
+    "river_lands": {
+      "name": "River Lands",
+      "generation": {
+        "ocean_fraction": 0.18,
+        "lake_fraction": 0.05,
+        "swamp_fraction": 0.12,
+        "forest_fraction": 0.22,
+        "river_sources": 14
+      }
+    },
+    "highlands": {
+      "name": "Highlands",
+      "generation": {
+        "ocean_fraction": 0.15,
+        "mountain_fraction": 0.18,
+        "hills_fraction": 0.3,
+        "swamp_fraction": 0.04,
+        "forest_fraction": 0.2,
+        "river_sources": 6
+      }
+    }
+  }
+}

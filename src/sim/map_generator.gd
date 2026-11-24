@@ -22,12 +22,17 @@ const Tile = preload("res://src/sim/tile.gd")
 const SALT := ["ocean", "coast"]
 
 
-## `overrides` replaces top-level setup.json keys (tests use it for small maps).
+## `overrides` replaces top-level setup.json keys, e.g. {"map_type": "islands"} or a
+## small map size for tests.
 static func generate(data, map_seed: int, overrides: Dictionary = {}) -> HexMap:
 	var setup: Dictionary = data.setup.duplicate(true)
 	for k in overrides:
 		setup[k] = overrides[k]
-	var gen: Dictionary = setup.get("generation", {})
+	# Map type preset, then any explicit "generation" overrides (tests use these).
+	var gen: Dictionary = data.generation_params(str(setup.get("map_type", "")))
+	var gen_overrides: Dictionary = setup.get("generation", {})
+	for k in gen_overrides:
+		gen[k] = gen_overrides[k]
 	var width := int(setup.get("map_width", 40))
 	var height := int(setup.get("map_height", 28))
 	var freq := float(gen.get("noise_frequency", 0.08))

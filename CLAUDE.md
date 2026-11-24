@@ -76,6 +76,9 @@ CI (`.github/workflows/tests.yml`) runs the same tests on every push.
 Map notes: `src/sim/map_generator.gd` runs ocean -> coast buffer -> land terrain -> rivers ->
 lairs. Invariants (tested): land never touches ocean (coast in between), lakes are inland,
 every lake and river drains to the sea. Terrain `water` tag: "salt", "fresh" or none.
+Map types (continents, islands, great lakes, river lands, highlands) are presets in
+`data/map_types.json`; `setup.json` `map_type` picks one. A new type is usually just JSON;
+one needing a different algorithm can add a `script` key and branch in the generator.
 
 Step 2 notes: until farms/mines exist (step 4) every tile a city claims yields its raw
 terrain stats. Food and manpower live in the city; wood, stone and gold in the faction

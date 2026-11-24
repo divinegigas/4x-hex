@@ -14,6 +14,7 @@ var state: GameState
 var map_view: MapView
 var camera: CameraController
 var hud: Hud
+var map_type: String
 
 
 func _ready() -> void:
@@ -34,6 +35,9 @@ func _ready() -> void:
 	map_view.tile_selected.connect(_on_tile_selected)
 	hud.end_round_pressed.connect(_on_end_round)
 	hud.new_map_pressed.connect(func() -> void: _start_game(0))
+	hud.map_type_pressed.connect(_on_map_type_pressed)
+	map_type = str(data.setup.get("map_type", "continents"))
+	hud.show_map_type(data.map_type_name(map_type))
 	hud.ravage_pressed.connect(_on_ravage)
 	hud.pace_selected.connect(_on_pace_selected)
 	hud.rations_selected.connect(_on_rations_selected)
@@ -45,7 +49,7 @@ func _ready() -> void:
 func _start_game(map_seed: int) -> void:
 	if map_seed == 0:
 		map_seed = randi_range(1, 2147483647)
-	var map := MapGenerator.generate(data, map_seed)
+	var map := MapGenerator.generate(data, map_seed, {"map_type": map_type})
 	state = GameSetup.start(data, map)
 	state.season_changed.connect(_on_season_changed)
 	map_view.bind(state)
@@ -58,7 +62,16 @@ func _start_game(map_seed: int) -> void:
 		camera.position = map_view.world_pos_of(capital.coord)
 		camera.zoom = Vector2.ONE
 		map_view.select_at_world(map_view.world_pos_of(capital.coord))
-	print("New map, seed %d" % map_seed)
+	print("New %s map, seed %d" % [data.map_type_name(map_type), map_seed])
+
+
+## Cycle to the next map type and generate a fresh map of it.
+func _on_map_type_pressed() -> void:
+	var ids := data.map_type_ids()
+	var i := ids.find(map_type)
+	map_type = ids[(i + 1) % ids.size()]
+	hud.show_map_type(data.map_type_name(map_type))
+	_start_game(0)
 
 
 func _on_tapped(screen_pos: Vector2) -> void:

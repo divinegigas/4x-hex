@@ -41,7 +41,7 @@ func test_salt_water_share_matches_setup() -> void:
 	for c in map.tiles:
 		if data.terrain_water(map.get_tile(c).terrain) == "salt":
 			salt += 1
-	var share := float(data.setup["generation"]["ocean_fraction"])
+	var share := float(data.generation_params("continents")["ocean_fraction"])
 	# Lakes that touch the sea become coast too, so there can be a few extra.
 	check(salt >= int(map.tile_count() * share), "salt tiles %d" % salt)
 	var land := 0
@@ -132,3 +132,47 @@ func test_lairs_count_terrain_and_spacing() -> void:
 func test_lair_count_comes_from_setup() -> void:
 	var map := MapGenerator.generate(data, 5, {"savage_spawn_tiles": 3})
 	check_eq(map.lair_coords().size(), 3)
+
+
+func test_every_map_type_keeps_the_water_rules() -> void:
+	check(data.map_type_ids().size() >= 2, "several map types")
+	for type_id in data.map_type_ids():
+		for map_seed in [5, 17]:
+			var map := MapGenerator.generate(data, map_seed, {"map_type": type_id})
+			var where := "%s seed %d" % [type_id, map_seed]
+			check_eq(map.tile_count(), map.width * map.height, where)
+			for c in map.tiles:
+				var t: String = map.get_tile(c).terrain
+				check(data.has_terrain(t), "%s: unknown terrain %s" % [where, t])
+				if t == "ocean":
+					for nb in map.neighbors_of(c):
+						var nt: String = map.get_tile(nb).terrain
+						check(nt == "ocean" or nt == "coast", "%s: %s next to ocean" % [where, nt])
+				if t == "lake" or t == "river":
+					check(_reaches_sea(map, c), "%s: %s at %s does not reach the sea" % [where, t, c])
+
+
+func test_map_types_differ() -> void:
+	var count_water := func(type_id: String) -> int:
+		var map := MapGenerator.generate(data, 9, {"map_type": type_id})
+		var n := 0
+		for c in map.tiles:
+			if data.terrain_water(map.get_tile(c).terrain) == "salt":
+				n += 1
+		return n
+	check(int(count_water.call("islands")) > int(count_water.call("continents")), "islands have more sea")
+	var count_high := func(type_id: String) -> int:
+		var map := MapGenerator.generate(data, 9, {"map_type": type_id})
+		var n := 0
+		for c in map.tiles:
+			var t: String = map.get_tile(c).terrain
+			if t == "hills" or t == "mountains":
+				n += 1
+		return n
+	check(int(count_high.call("highlands")) > int(count_high.call("continents")), "highlands are higher")
+
+
+func test_unknown_map_type_falls_back_to_default() -> void:
+	var a := MapGenerator.generate(data, 31, {"map_type": "no_such_type"})
+	var b := MapGenerator.generate(data, 31, {"map_type": str(data.map_types["default"])})
+	check_eq(_terrain_signature(a), _terrain_signature(b))
